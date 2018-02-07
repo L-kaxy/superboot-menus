@@ -38,6 +38,10 @@ public class MenuParam extends CoreParam {
 	 */
 	private PageinfoPo pageinfo;
 
+	private String permissionList;
+
+	private String permissionList2;
+
 	public String getMenuList() {
 		return menuList;
 	}
@@ -76,6 +80,22 @@ public class MenuParam extends CoreParam {
 
 	public void setPageinfo(PageinfoPo pageinfo) {
 		this.pageinfo = pageinfo;
+	}
+
+	public String getPermissionList() {
+		return permissionList;
+	}
+
+	public void setPermissionList(String permissionList) {
+		this.permissionList = permissionList;
+	}
+
+	public String getPermissionList2() {
+		return permissionList2;
+	}
+
+	public void setPermissionList2(String permissionList2) {
+		this.permissionList2 = permissionList2;
 	}
 
 }

@@ -18,6 +18,7 @@ import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.menu.controller.Param.MenuParam;
 import com.wteam.superboot.menu.entity.po.MenuItemPo;
 import com.wteam.superboot.menu.service.MenuItemService;
+import com.wteam.superboot.security.entity.po.AuthitemPo;
 
 /**
  * 菜单项Controller.
@@ -37,18 +38,21 @@ public class MenuItemController {
 		return service.getMenuItemByMenuItemId(menuItemPo);
 	}
 
-	@PostMapping("/addMenuItemByList")
-	public ResultMessage addMenuItemByList(@RequestBody MenuParam param,
-			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<MenuItemPo> poList = JsonHelper.jsonToBeanList(param.getMenuItemList(), MenuItemPo.class);
-		return service.addMenuItemByList(poList, currentUser);
+	@PostMapping("/addMenuItem")
+	public ResultMessage addMenuItem(@RequestBody MenuParam param, @RequestAttribute("currentUser") UserPo currentUser)
+			throws Exception {
+		List<AuthitemPo> addPermissionPos = JsonHelper.jsonToBeanList(param.getPermissionList(), AuthitemPo.class);
+		MenuItemPo menuItemPo = param.getMenuItem().voToPo(MenuItemPo.class);
+		return service.addMenuItem(menuItemPo, addPermissionPos, currentUser);
 	}
 
-	@PostMapping("/editMenuItemByList")
-	public ResultMessage editMenuItemByList(@RequestBody MenuParam param,
-			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<MenuItemPo> poList = JsonHelper.jsonToBeanList(param.getMenuItemList(), MenuItemPo.class);
-		return service.editMenuItemByList(poList, currentUser);
+	@PostMapping("/editMenuItem")
+	public ResultMessage editMenuItem(@RequestBody MenuParam param, @RequestAttribute("currentUser") UserPo currentUser)
+			throws Exception {
+		List<AuthitemPo> addPermissionPos = JsonHelper.jsonToBeanList(param.getPermissionList(), AuthitemPo.class);
+		List<AuthitemPo> subPermissionPos = JsonHelper.jsonToBeanList(param.getPermissionList2(), AuthitemPo.class);
+		MenuItemPo menuItemPo = param.getMenuItem().voToPo(MenuItemPo.class);
+		return service.editMenuItem(menuItemPo, addPermissionPos, subPermissionPos, currentUser);
 	}
 
 	@PostMapping("/deleteMenuItemByList")

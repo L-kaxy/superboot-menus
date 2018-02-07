@@ -21,9 +21,11 @@ import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.menu.entity.po.MenuItemPo;
 import com.wteam.superboot.menu.entity.vo.MenuItemVo;
 import com.wteam.superboot.menu.repository.MenuItemRepository;
+import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.entity.po.PermissionresourcemapPo;
 import com.wteam.superboot.security.entity.po.ResourcePo;
 import com.wteam.superboot.security.entity.po.ResourcetypePo;
+import com.wteam.superboot.security.repository.AuthitemRepository;
 import com.wteam.superboot.security.repository.PermissionresourcemapRepository;
 import com.wteam.superboot.security.repository.ResourceRepository;
 import com.wteam.superboot.security.repository.ResourcetypeRepository;
@@ -57,6 +59,12 @@ public class MenuItemService {
 	private ResourceRepository resourceRepository;
 
 	/**
+	 * 注入authitemRepository.
+	 */
+	@Autowired
+	private AuthitemRepository authitemRepository;
+
+	/**
 	 * 注入permissionresourcemapRepository.
 	 */
 	@Autowired
@@ -68,8 +76,9 @@ public class MenuItemService {
 	 * @return
 	 * @throws Exception
 	 */
-	public ResultMessage addMenuItemByList(final List<MenuItemPo> list, final UserPo currentUser) throws Exception {
-		if (list == null) {
+	public ResultMessage addMenuItem(final MenuItemPo menuItem, final List<AuthitemPo> permissions,
+			final UserPo currentUser) throws Exception {
+		if (menuItem == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (currentUser == null) {
@@ -80,13 +89,18 @@ public class MenuItemService {
 		type.setResourcetypename("menuitem");
 		type = resourcetypeRepository.queryEntity(type);
 
-		ResourcePo resource = null;
-		for (MenuItemPo po : list) {
-			menuItemRepository.addEntity(po, currentUser);
-			resource = new ResourcePo();
-			resource.setRealid(po.getMenuitemid());
-			resource.setResourcetypeid(type.getResourcetypeid());
-			resourceRepository.addEntity(resource, currentUser);
+		menuItemRepository.addEntity(menuItem, currentUser);
+		ResourcePo resource = new ResourcePo();
+		resource.setRealid(menuItem.getMenuitemid());
+		resource.setResourcetypeid(type.getResourcetypeid());
+		resourceRepository.addEntity(resource, currentUser);
+
+		PermissionresourcemapPo prmap = null;
+		for (AuthitemPo tempPermission : permissions) {
+			prmap = new PermissionresourcemapPo();
+			prmap.setPermissionid(tempPermission.getAuthitemid());
+			prmap.setResourceid(resource.getResourceid());
+			permissionresourcemapRepository.addEntity(prmap, currentUser);
 		}
 		ResultMessage rs = ResultHelper.result(ResultEnum.ADD_SUCCESS);
 
@@ -142,17 +156,40 @@ public class MenuItemService {
 	 * @return
 	 * @throws Exception
 	 */
-	public ResultMessage editMenuItemByList(final List<MenuItemPo> list, final UserPo currentUser) throws Exception {
-		if (list == null) {
+	public ResultMessage editMenuItem(final MenuItemPo menuItem, final List<AuthitemPo> addPermissions,
+			final List<AuthitemPo> subPermissions, final UserPo currentUser) throws Exception {
+		if (menuItem == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (currentUser == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 
-		for (MenuItemPo po : list) {
-			menuItemRepository.editEntity(po, currentUser);
+		menuItemRepository.editEntity(menuItem, currentUser);
+
+		ResourcetypePo type = new ResourcetypePo();
+		type.setResourcetypename("menuitem");
+		type = resourcetypeRepository.queryEntity(type);
+
+		ResourcePo resource = new ResourcePo();
+		resource.setResourcetypeid(type.getResourcetypeid());
+		resource.setRealid(menuItem.getMenuitemid());
+		resource = resourceRepository.queryEntity(resource);
+
+		PermissionresourcemapPo prmapPo = null;
+		for (AuthitemPo tempPermission : addPermissions) {
+			prmapPo = new PermissionresourcemapPo();
+			prmapPo.setResourceid(resource.getResourceid());
+			prmapPo.setPermissionid(tempPermission.getAuthitemid());
+			permissionresourcemapRepository.addEntity(prmapPo, currentUser);
 		}
+		for (AuthitemPo tempPermission : subPermissions) {
+			prmapPo = new PermissionresourcemapPo();
+			prmapPo.setResourceid(resource.getResourceid());
+			prmapPo.setPermissionid(tempPermission.getAuthitemid());
+			permissionresourcemapRepository.deleteEntity(prmapPo);
+		}
+
 		ResultMessage rs = ResultHelper.result(ResultEnum.EDIT_SUCCESS);
 
 		return rs;
@@ -171,8 +208,27 @@ public class MenuItemService {
 
 		MenuItemPo menuItemPo = menuItemRepository.getEntityById(MenuItemPo.class, menuItem.getMenuitemid());
 
+		ResourcetypePo type = new ResourcetypePo();
+		type.setResourcetypename("menuitem");
+		type = resourcetypeRepository.queryEntity(type);
+
+		ResourcePo resource = new ResourcePo();
+		resource.setResourcetypeid(type.getResourcetypeid());
+		resource.setRealid(menuItem.getMenuitemid());
+		resource = resourceRepository.queryEntity(resource);
+
+		PermissionresourcemapPo prmapPo = new PermissionresourcemapPo();
+		prmapPo.setResourceid(resource.getResourceid());
+		AuthitemPo pPo = null;
+		List<AuthitemPo> permissionList = new ArrayList<AuthitemPo>();
+		for (PermissionresourcemapPo tampPmapPo : permissionresourcemapRepository.queryNonDeleteList(prmapPo)) {
+			pPo = authitemRepository.getEntityById(AuthitemPo.class, tampPmapPo.getPermissionid());
+			permissionList.add(pPo);
+		}
+
 		Map<String, Object> parm = new HashMap<String, Object>();
 		parm.put("menuItem", menuItemPo);
+		parm.put("permissionList", permissionList);
 
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
