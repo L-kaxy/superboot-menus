@@ -196,6 +196,28 @@ public class MenuItemService {
 	}
 
 	/**
+	 * 批量编辑菜单项.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public ResultMessage editMenuItemByList(final List<MenuItemPo> list, final UserPo currentUser) throws Exception {
+		if (list == null) {
+			throw new SuperException(ResultEnum.PARAM_ERROR);
+		}
+		if (currentUser == null) {
+			throw new SuperException(ResultEnum.PARAM_ERROR);
+		}
+
+		for (MenuItemPo po : list) {
+			menuItemRepository.editEntity(po, currentUser);
+		}
+		ResultMessage rs = ResultHelper.result(ResultEnum.EDIT_SUCCESS);
+
+		return rs;
+	}
+
+	/**
 	 * 根据菜单项编号获取菜单项.
 	 * 
 	 * @return

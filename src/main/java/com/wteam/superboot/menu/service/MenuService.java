@@ -183,7 +183,8 @@ public class MenuService {
 		for (MenuPo po : list) {
 			valid = new MenuPo();
 			valid.setMenuname(po.getMenuname());
-			if (menuRepository.hasNonDeleteEntity(valid)) {
+			MenuPo tempValid = menuRepository.queryEntity(valid);
+			if (tempValid != null && tempValid.getMenuid() != po.getMenuid()) {
 				sameName.add(po);
 			} else {
 				menuRepository.editEntity(po, currentUser);

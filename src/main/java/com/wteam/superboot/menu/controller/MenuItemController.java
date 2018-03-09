@@ -55,6 +55,13 @@ public class MenuItemController {
 		return service.editMenuItem(menuItemPo, addPermissionPos, subPermissionPos, currentUser);
 	}
 
+	@PostMapping("/editMenuItemByList")
+	public ResultMessage editMenuItemByList(@RequestBody MenuParam param,
+			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
+		List<MenuItemPo> poList = JsonHelper.jsonToBeanList(param.getMenuItemList(), MenuItemPo.class);
+		return service.editMenuItemByList(poList, currentUser);
+	}
+
 	@PostMapping("/deleteMenuItemByList")
 	public ResultMessage deleteMenuItemByList(@RequestBody MenuParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
