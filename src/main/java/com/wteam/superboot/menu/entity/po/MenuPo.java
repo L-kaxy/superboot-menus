@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Wteamfly.  All rights reserved. 网飞公司 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.menu.entity.po;
@@ -18,6 +18,8 @@ import com.wteam.superboot.core.entity.po.BasePersistentObject;
 /**
  * 菜单持久层类.
  * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @Entity
 @Table(name = "t_menu")
@@ -38,36 +40,37 @@ public class MenuPo extends BasePersistentObject {
 	private String menuname;
 
 	/**
-	 * @return 获取的menuid
+	 * @return 设置 menuid 的值.
 	 */
 	public Long getMenuid() {
 		return menuid;
 	}
 
 	/**
-	 * 设置menuid的方法.
+	 * 设置 menuid 的值.
 	 * 
 	 * @param menuid
-	 *            赋值给menuid的值
+	 *            赋值给 menuid.
 	 */
 	public void setMenuid(Long menuid) {
 		this.menuid = menuid;
 	}
 
 	/**
-	 * @return 获取的menuname
+	 * @return 设置 menuname 的值.
 	 */
 	public String getMenuname() {
 		return menuname;
 	}
 
 	/**
-	 * 设置menuname的方法.
+	 * 设置 menuname 的值.
 	 * 
 	 * @param menuname
-	 *            赋值给menuname的值
+	 *            赋值给 menuname.
 	 */
-	public void setMenuname(final String menuname) {
+	public void setMenuname(String menuname) {
 		this.menuname = menuname;
 	}
+
 }

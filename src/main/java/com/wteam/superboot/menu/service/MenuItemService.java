@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.menu.service;
@@ -19,7 +19,6 @@ import com.wteam.superboot.core.exception.SuperException;
 import com.wteam.superboot.core.helper.ResultHelper;
 import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.menu.entity.po.MenuItemPo;
-import com.wteam.superboot.menu.entity.vo.MenuItemVo;
 import com.wteam.superboot.menu.repository.MenuItemRepository;
 import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.entity.po.PermissionresourcemapPo;
@@ -31,50 +30,41 @@ import com.wteam.superboot.security.repository.ResourceRepository;
 import com.wteam.superboot.security.repository.ResourcetypeRepository;
 
 /**
- * 菜单项Service类.
+ * 菜单项 Service类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class MenuItemService {
 
 	/**
-	 * 注入menuItemRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private MenuItemRepository menuItemRepository;
-
-	/**
-	 * 注入resourcetypeRepository.
-	 */
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
-	/**
-	 * 注入resourceRepository.
-	 */
 	@Autowired
 	private ResourceRepository resourceRepository;
-
-	/**
-	 * 注入authitemRepository.
-	 */
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
-	/**
-	 * 注入permissionresourcemapRepository.
-	 */
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
 
 	/**
 	 * 批量添加菜单项.
 	 * 
-	 * @return
+	 * @param menuItem
+	 *            菜单项实体.
+	 * @param permissions
+	 *            行为列表.
+	 * @param currentUser
+	 *            当期用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage addMenuItem(final MenuItemPo menuItem, final List<AuthitemPo> permissions,
 			final UserPo currentUser) throws Exception {
@@ -110,8 +100,13 @@ public class MenuItemService {
 	/**
 	 * 批量删除菜单项.
 	 * 
-	 * @return
+	 * @param list
+	 *            菜单项列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage deleteMenuItemByList(final List<MenuItemPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -153,8 +148,17 @@ public class MenuItemService {
 	/**
 	 * 批量编辑菜单项.
 	 * 
-	 * @return
+	 * @param menuItem
+	 *            菜单项.
+	 * @param addPermissions
+	 *            添加的行为列表.
+	 * @param subPermissions
+	 *            删除的行为列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editMenuItem(final MenuItemPo menuItem, final List<AuthitemPo> addPermissions,
 			final List<AuthitemPo> subPermissions, final UserPo currentUser) throws Exception {
@@ -198,8 +202,13 @@ public class MenuItemService {
 	/**
 	 * 批量编辑菜单项.
 	 * 
-	 * @return
+	 * @param list
+	 *            菜单项列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editMenuItemByList(final List<MenuItemPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -220,8 +229,11 @@ public class MenuItemService {
 	/**
 	 * 根据菜单项编号获取菜单项.
 	 * 
-	 * @return
+	 * @param menuItem
+	 *            菜单项.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage getMenuItemByMenuItemId(final MenuItemPo menuItem) throws Exception {
 		if (menuItem == null) {
@@ -260,8 +272,11 @@ public class MenuItemService {
 	/**
 	 * 获取指定菜单所有菜单项.
 	 * 
-	 * @return
+	 * @param menuItem
+	 *            菜单项.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage getMenuMenuItemList(final MenuItemPo menuItem) throws Exception {
 		if (menuItem == null) {
@@ -273,18 +288,9 @@ public class MenuItemService {
 		List<MenuItemPo> poList = menuItemRepository.queryNonDeleteList(theMenuItem);
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-		List<MenuItemVo> resultList = new ArrayList<MenuItemVo>();
-		MenuItemVo tempVo = null;
-		for (MenuItemPo po : poList) {
-			tempVo = new MenuItemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("menuItemList", resultList);
+		parm.put("menuItemList", poList);
 
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 

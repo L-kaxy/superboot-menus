@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.menu.service;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wteam.superboot.core.entity.po.PageinfoPo;
-import com.wteam.superboot.core.entity.po.SuperPersistentObject;
 import com.wteam.superboot.core.entity.po.UserPo;
 import com.wteam.superboot.core.enums.ResultEnum;
 import com.wteam.superboot.core.exception.SuperException;
@@ -23,8 +22,6 @@ import com.wteam.superboot.core.helper.ResultHelper;
 import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.menu.entity.po.MenuItemPo;
 import com.wteam.superboot.menu.entity.po.MenuPo;
-import com.wteam.superboot.menu.entity.vo.MenuItemVo;
-import com.wteam.superboot.menu.entity.vo.MenuVo;
 import com.wteam.superboot.menu.repository.MenuItemRepository;
 import com.wteam.superboot.menu.repository.MenuRepository;
 import com.wteam.superboot.security.entity.po.AuthitemmapPo;
@@ -39,62 +36,43 @@ import com.wteam.superboot.security.repository.ResourcetypeRepository;
 import com.wteam.superboot.security.repository.UserauthitemmapRepository;
 
 /**
- * 菜单项Service类.
+ * 菜单 Service类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class MenuService {
 
 	/**
-	 * 注入menuItemRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private MenuItemRepository menuItemRepository;
-
-	/**
-	 * 注入menuItemRepository.
-	 */
 	@Autowired
 	private MenuRepository menuRepository;
-
-	/**
-	 * 注入userauthitemmapRepository.
-	 */
 	@Autowired
 	private UserauthitemmapRepository userauthitemmapRepository;
-
-	/**
-	 * 注入authitemmapRepository.
-	 */
 	@Autowired
 	private AuthitemmapRepository authitemmapRepository;
-
-	/**
-	 * 注入resourcetypeRepository.
-	 */
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
-	/**
-	 * 注入permissionresourcemapRepository.
-	 */
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
-
-	/**
-	 * 注入resourceRepository.
-	 */
 	@Autowired
 	private ResourceRepository resourceRepository;
 
 	/**
 	 * 批量添加菜单.
 	 * 
-	 * @return
+	 * @param list
+	 *            菜单列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage addMenuItemByList(final List<MenuPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -130,8 +108,13 @@ public class MenuService {
 	/**
 	 * 批量删除菜单.
 	 * 
-	 * @return
+	 * @param list
+	 *            菜单列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage deleteMenuByList(final List<MenuPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -167,8 +150,13 @@ public class MenuService {
 	/**
 	 * 批量编辑菜单.
 	 * 
-	 * @return
+	 * @param list
+	 *            菜单列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editMenuByList(final List<MenuPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -205,14 +193,16 @@ public class MenuService {
 	/**
 	 * 菜单分页.
 	 * 
-	 * @return
+	 * @param pageinfo
+	 *            分页信息.
+	 * @param likePo
+	 *            模糊查询对象.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage pageMenu(final PageinfoPo pageinfo, final MenuPo likePo) throws Exception {
 		if (pageinfo == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (likePo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (pageinfo.getSortFieldNames() == null) {
@@ -225,36 +215,34 @@ public class MenuService {
 		Page<MenuPo> pageResult = menuRepository.pageNonDeleteEntity(pageinfo, new MenuPo(), likePo);
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<MenuVo> resultList = new ArrayList<MenuVo>();
-		MenuVo tempVo = null;
-		for (SuperPersistentObject po : pageResult.getContent()) {
-			tempVo = new MenuVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("pageList", resultList);
+		parm.put("pageList", pageResult.getContent());
 		parm.put("totalCount", pageResult.getTotalElements());
 
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 
 	/**
 	 * 获取当前用户指定菜单.
 	 * 
-	 * @return
+	 * @param menuname
+	 *            菜单名.
+	 * @param userPo
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
-	public ResultMessage getCurrentUserMenuItemList(final MenuPo menuPo, final UserPo userPo) throws Exception {
-		if (menuPo == null) {
+	public ResultMessage getCurrentUserMenuItemList(final String menuname, final UserPo userPo) throws Exception {
+		if (menuname == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (userPo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
+
+		MenuPo menuPo = new MenuPo();
+		menuPo.setMenuname(menuname);
 
 		// 获取指定用户的所有权限编号
 		UserauthitemmapPo userauth = new UserauthitemmapPo();
@@ -299,19 +287,9 @@ public class MenuService {
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("menuItemList", menuItems.values());
 
-		List<MenuItemVo> resultList = new ArrayList<MenuItemVo>();
-		MenuItemVo tempVo = null;
-		for (MenuItemPo po : menuItems.values()) {
-			tempVo = new MenuItemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("menuItemList", resultList);
-		
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 
